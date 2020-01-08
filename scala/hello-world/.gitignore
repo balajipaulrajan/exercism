@@ -1,4 +1,5 @@
 .metals
 .bloop
-target/*
+target
+.exercism
 project/*
