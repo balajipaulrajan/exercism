@@ -1,6 +1,15 @@
+import scala.annotation.tailrec
 object Hamming {
 
   def distance(str1: String, str2: String): Option[Int] = {
+    if(str1.length != str2.length) None
+    else {
+      val diff = (str1 zip str2).filter(pair => pair._1 != pair._2).length
+      Some(diff)
+    }
+  }
+
+  def distanceRecursive(str1: String, str2: String): Option[Int] = {
     def loop(strList1: List[Char], strList2: List[Char], acc: Int): Option[Int] = (strList1, strList2) match {
       case (Nil, Nil) => Some(acc)
       case (Nil, _) | (_, Nil) => None
