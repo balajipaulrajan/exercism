@@ -1,10 +1,10 @@
-import scala.annotation.tailrec
 object Hamming {
 
   def distance(str1: String, str2: String): Option[Int] = {
     if(str1.length != str2.length) None
     else {
-      val diff = (str1 zip str2).filter(pair => pair._1 != pair._2).length
+      val diff = str1.zip(str2)
+                     .count { case (x,y) => x != y }
       Some(diff)
     }
   }
