@@ -7,15 +7,14 @@ object Etl {
   def transformWithForComprehension(input: Map[Int, Seq[String]]): Map[String, Int] = {
     for {
       (digit, letters) <- input
-      letterWithUpperCase <- letters
-      letter =  letterWithUpperCase.toLowerCase
-    } yield (letter, digit)
+      letter <- letters
+    } yield (letter.toLowerCase, digit)
   }
 
   def transformWithFlatMap(input: Map[Int, Seq[String]]): Map[String, Int] = {
     input
       .flatMap { 
-        case (key,values) => values.map(x => (x.toLowerCase(), key)) 
+        case (digit, letters) => letters.map(_.toLowerCase() -> digit)
       }
   }
 }
