@@ -1,31 +1,58 @@
-sealed trait Bearing;
-case class North() extends Bearing;
-case class South() extends Bearing;
-case class East() extends Bearing;
-case class West() extends Bearing;
+object Bearing extends Enumeration {
+ type Bearing = Value
+ val East, West, North, South = Value
+}
 
-sealed trait RobotCommand;
-case class Advance() extends RobotCommand;
-case class TurnRight() extends RobotCommand;
-case class TurnLeft() extends RobotCommand;
+class Robot(val x:Int, val y: Int, val facing: Bearing.Value) {
+  
+  def bearing = this.facing;
+  def coordinates = (this.x, this.y)
 
-class RobotState(val x:Int, val y: Int, val facing: Bearing) {}
+  def turnLeft: Robot = this.facing match { 
+    case Bearing.North => Robot(Bearing.West,(this.x, this.y))
+    case Bearing.South => Robot(Bearing.East, (this.x, this.y))
+    case Bearing.East => Robot(Bearing.North, (this.x, this.y))
+    case Bearing.West => Robot(Bearing.South, (this.x, this.y))
+  }
 
-class Robot(val state: RobotState) {
+  def turnRight: Robot =  this.facing match { 
+    case Bearing.East => Robot(Bearing.South, (this.x, this.y))
+    case Bearing.West => Robot(Bearing.North, (this.x, this.y))
+    case Bearing.North => Robot(Bearing.East, (this.x, this.y))
+    case Bearing.South => Robot(Bearing.West, (this.x, this.y))
+  }
 
-  override def equals(x: Any): Boolean = {
-   if (x.isInstanceOf[Robot]) {
-      val that = x.asInstanceOf[Robot]
-      this.state.x == that.state.x && 
-      this.state.y == that.state.y &&
-      this.state.facing == that.state.facing 
+  def advance: Robot = this.facing match {
+    case Bearing.East => Robot(Bearing.East, (this.x + 1, this.y))
+    case Bearing.West => Robot(Bearing.West, (this.x - 1, this.y))
+    case Bearing.North => Robot(Bearing.North, (this.x, this.y + 1))
+    case Bearing.South => Robot(Bearing.South, (this.x, this.y - 1))
+  }
+
+  def simulate(instructions: String): Robot = {  
+    instructions.foldLeft (this) { (robot: Robot, instruction: Char) => instruction match {
+        case 'A' => robot.advance
+        case 'L' => robot.turnLeft
+        case 'R' => robot.turnRight
+      } 
+    }
+  }
+
+  def canEqual(a: Any) = a.isInstanceOf[Robot]
+
+  override def equals(that: Any): Boolean = that match {
+   case that: Robot => {
+      that.canEqual(this) && 
+      this.x == that.x && 
+      this.y == that.y &&
+      this.facing == that.facing 
    }
-   false
+   case _ => false
   }
 }
 
 object Robot {
-  def apply(facing: Bearing, location: (Int,Int)) {
-    new Robot(new RobotState(location._1, location._2, facing))
+  def apply(facing: Bearing.Value, location: (Int,Int)): Robot = {
+    new Robot(location._1, location._2, facing)
   }
 }
